@@ -255,7 +255,7 @@ function updatePlayerHealthBar() {
   this.healthBar.setSize(50 * (this.player.health / 3), 25);
   gmaeEnd.call(this);
 }
-function createStar() {
+function createStar() { 
   this.platforms.getChildren().forEach((platform) => {
     for (
       let i = 0;
