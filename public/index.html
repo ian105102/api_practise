@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+
+    <script
+      src="https://kit.fontawesome.com/1ae1fd21a3.js"
+      crossorigin="anonymous"
+    ></script>
+    <title>登入網站設計</title>
+    <meta charser="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="css/index.css" rel="stylesheet" />
+  </head>
+  <body>
+    <header>
+      <h1>帳號登入練習</h1>
+      <p class="logintext"></p>
+      <div class="ch in">登入</div>
+      <div class="ch in">註冊</div>
+      <div class="ch out">登出</div>
+    </header>
+    <div class="other"></div>
+    <div class="user">
+      <!-- <h1 class="title">hello world</h1> -->
+      <div class="userpage login">
+        <p class="close"><i class="fa-solid fa-x"></i></p>
+        <h2>登入帳號</h2>
+        <p>帳號</p>
+        <input type="email" class="loginaccount" />
+        <p>密碼</p>
+        <input type="password" class="loginpassword" />
+        <br />
+        <a href="javascript: void(0)" class="btn loginclick" type="submit"r> 登入帳號 </a>
+        <p class="loginmessage"></p>
+      </div>
+      <div class="userpage create">
+        <p class="close"><i class="fa-solid fa-x"></i></p>
+        <h2>註冊帳號</h2>
+        <p>*使用者名稱 <span></span></p>
+        <input type="text" class="createname" />
+        <p>*帳號 <span> 使用example@xxxxxx</span></p>
+        <input type="email" class="createaccount" />
+        <p>*密碼 <span>6~30英文大小寫、數字</span></p>
+        <input class="inputpassword createpassword" type="password"  />
+        <p class="t3">*確認密碼 <span >與確認密碼相同</span></p>
+        <input class="cheakpassword " type="password" />
+        <br />
+        <a href="javascript: void(0)" class="btn createclick" type="submit"> 註冊帳號 </a>
+        <p class="createmessage"></p>
+      </div>
+    </div>
+    <div class="other"></div>
+    <footer></footer>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script type="module" src="js/index.js"></script>
+    <script type="module" src="js/move.js"></script>
+
+  </body>
+</html>
