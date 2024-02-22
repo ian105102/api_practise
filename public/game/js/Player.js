@@ -19,17 +19,7 @@ function preload() {
   });
   this.load.image("gun", "game/assets/gun.png");
 }
-
-function create() {
-  this.SprintNum = 0;
-  this.mouse_point = {
-    x: 0,
-    y: 0,
-    velocity_X: 0,
-    velocity_Y: 0,
-  };
-  main.health = 3;
-  main.score = 0;
+function initializeInput() {
   this.mouseX = 0;
   this.mouseY = 0;
 
@@ -86,10 +76,8 @@ function create() {
   this.keySpace = this.input.keyboard.addKey(
     Phaser.Input.Keyboard.KeyCodes.SPACE
   );
-
-  this.sky = this.add.image(400, 300, "sky");
-  this.sky.setScrollFactor(0);
-
+}
+function initializePlatforms() {
   this.platforms = this.physics.add.staticGroup();
   this.platforms.create(-400, 600, "ground").setScale(9, 1).refreshBody();
   this.platforms.create(600, 400, "ground");
@@ -104,7 +92,12 @@ function create() {
   this.platforms.create(50, 350, "ground").setScale(1, 9).refreshBody();
   this.platforms.create(-500, 350, "ground").setScale(1, 9).refreshBody();
   this.platforms.create(750, 220, "ground");
-
+}
+function initializeBackground() {
+  this.sky = this.add.image(400, 300, "sky");
+  this.sky.setScrollFactor(0);
+}
+function initializePlayer() {
   this.player = this.physics.add.sprite(95, 506, "dude");
   this.player.setBounce(0, 0);
   this.player.body.setGravityY(1000);
@@ -122,7 +115,7 @@ function create() {
   this.gun.body.setSize(0.01, 0.01);
   this.gun.setOrigin(-0.4, 0.5);
   this.gun.body.setAllowGravity(false);
-  this.physics.add.collider(this.player, this.platforms);
+
   this.anims.create({
     key: "left",
     frames: this.anims.generateFrameNumbers("dude", { start: 0, end: 3 }),
@@ -140,35 +133,40 @@ function create() {
     frameRate: 10,
     repeat: -1,
   });
-
-  this.stars = this.physics.add.group({
-    // key: "star",
-    // repeat: 11,
-    // setXY: { x: 0, y: -350, stepX: 70 },
-  });
-  createStar.call(this);
-
-  this.bullets = this.physics.add.group();
-  this.physics.add.overlap(
-    this.bullets,
-    this.platforms,
-    (bullet, platform) => {
-      bullet.destroy();
-    },
-    null,
-    this
-  );
-
-  this.stars.children.iterate(function (child) {
-    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-  });
-  this.physics.add.collider(this.stars, this.platforms);
-  this.physics.add.overlap(this.player, this.stars, collectStar, null, this);
-
-  this.bombs = this.physics.add.group();
-  this.physics.add.collider(this.bombs, this.platforms);
-  this.physics.add.collider(this.bombs, this.bullets, hitbullet, null, this);
-  this.physics.add.collider(this.player, this.bombs, hitBomb, null, this);
+}
+function initializeUIset() {
+  // this.graphics = this.add.graphics();
+  // let gameWidth = this.game.config.width * 2;
+  // let gameHeight = this.game.config.height * 2;
+  // let gridSize = 50; // 網格的單元大小
+  // // 設置網格線的顏色和透明度
+  // this.graphics.lineStyle(1, 0xffffff, 0.5);
+  // // 繪製垂直線和添加數字
+  // for (let x = -gameWidth; x <= gameWidth; x += gridSize) {
+  //   this.graphics.beginPath();
+  //   this.graphics.moveTo(x, -gameHeight);
+  //   this.graphics.lineTo(x, gameHeight);
+  //   this.graphics.closePath();
+  //   this.graphics.strokePath();
+  //   // 添加垂直線上的數字
+  //   this.add.text(x + 5, 5, x.toString(), {
+  //     fontSize: "10px",
+  //     fill: "#ffffff",
+  //   });
+  // }
+  // // 繪製水平線和添加數字
+  // for (let y = -gameHeight; y <= gameHeight; y += gridSize) {
+  //   this.graphics.beginPath();
+  //   this.graphics.moveTo(-gameWidth, y);
+  //   this.graphics.lineTo(gameWidth, y);
+  //   this.graphics.closePath();
+  //   this.graphics.strokePath();
+  //   // 添加水平線上的數字
+  //   this.add.text(5, y + 5, y.toString(), {
+  //     fontSize: "10px",
+  //     fill: "#ffffff",
+  //   });
+  // }
 
   this.scoreText = this.add.text(16, 16, "score: 0", {
     color: "#ff0",
@@ -190,125 +188,76 @@ function create() {
     .rectangle(180, 555, 50, 25, 0xff0000)
     .setOrigin(0, 0.5)
     .setScrollFactor(0);
-
-  // 創建血量條指示器
   this.healthBar = this.add
     .rectangle(180, 555, 50, 25, 0x00ff00)
     .setOrigin(0, 0.5)
     .setScrollFactor(0);
-
   this.scoreText.setScrollFactor(0);
   this.liftText.setScrollFactor(0);
-  let graphics = this.add.graphics();
-  let gameWidth = this.game.config.width * 2;
-  let gameHeight = this.game.config.height * 2;
-  let gridSize = 50; // 網格的單元大小
-  // 設置網格線的顏色和透明度
-  graphics.lineStyle(1, 0xffffff, 0.5);
-
-  // 繪製垂直線和添加數字
-  for (let x = -gameWidth; x <= gameWidth; x += gridSize) {
-    graphics.beginPath();
-    graphics.moveTo(x, -gameHeight);
-    graphics.lineTo(x, gameHeight);
-    graphics.closePath();
-    graphics.strokePath();
-
-    // 添加垂直線上的數字
-    this.add.text(x + 5, 5, x.toString(), {
-      fontSize: "10px",
-      fill: "#ffffff",
-    });
-  }
-
-  // 繪製水平線和添加數字
-  for (let y = -gameHeight; y <= gameHeight; y += gridSize) {
-    graphics.beginPath();
-    graphics.moveTo(-gameWidth, y);
-    graphics.lineTo(gameWidth, y);
-    graphics.closePath();
-    graphics.strokePath();
-    // 添加水平線上的數字
-    this.add.text(5, y + 5, y.toString(), {
-      fontSize: "10px",
-      fill: "#ffffff",
-    });
-  }
-  let miniMapX = this.cameras.main.width - 100; // 計算小地圖的 x 座標
-  let miniMapY = this.cameras.main.height - 75; // 計算小地圖的 y 座標
-  
-  // 創建小地圖 Graphics 物件
-  this.miniMap = this.add.graphics({ x: miniMapX, y: miniMapY }); 
-  
-  // 在小地圖上繪製矩形
-  this.miniMap.fillStyle(0xffffff, 1); // 使用白色填充
-  this.miniMap.fillRect(0, 0, 100, 75); // 繪製一個 100x75 的矩形，位置從(0, 0)開始
-  
-  // 在畫布上顯示小地圖
-  this.miniMapImage = this.miniMap.generateTexture('miniMap', 100, 75); // 生成一個紋理
-  this.miniMapImage.setVisible(false);
-  this.miniMapSprite = this.add.image(miniMapX, miniMapY, 'miniMap'); // 創建一個圖像對象，並設置位置在右下角
-  this.miniMapSprite.setScrollFactor(0);
 }
-function updatePlayerHealthBar() {
-  // 更新血量條的寬度
-  this.healthBar.setSize(50 * (this.player.health / 3), 25);
-  gmaeEnd.call(this);
+function initializeEvent() {
+  this.physics.add.collider(this.player, this.platforms);
+  this.physics.add.collider(this.bombs, this.platforms);
+  this.physics.add.collider(this.bombs, this.bullets, hitbullet, null, this);
+  this.physics.add.collider(this.player, this.bombs, hitBomb, null, this);
+  this.physics.add.collider(this.stars, this.platforms);
+  this.physics.add.overlap(this.player, this.stars, collectStar, null, this);
 }
-function createStar() { 
-  this.platforms.getChildren().forEach((platform) => {
-    for (
-      let i = 0;
-      i <
-      Phaser.Math.Between(
-        0,
-        (1 * (platform.body.right - platform.body.left)) / 100
-      );
-      i++
-    ) {
-      this.stars.create(
-        Phaser.Math.Between(platform.body.left, platform.body.right),
-        platform.body.top - 50,
-        "star"
-      );
-    }
+function initializeMap() {
+  this.miniMapCamera = this.cameras.add(525, 420, 270, 170).setZoom(0.16); // 在右下角添加一個100x75的鏡頭，並將其縮放為原來的十分之一
+  this.miniMapCamera.setBackgroundColor(0xd2ebff);
+  this.miniMapCamera.ignore(this.sky);
+  this.miniMapCamera.ignore(this.gun);
+  this.miniMapCamera.ignore(this.scoreText);
+  this.miniMapCamera.ignore(this.liftText);
+  this.miniMapCamera.ignore(this.healthBarBackground);
+  this.miniMapCamera.ignore(this.healthBarBackground_);
+  this.miniMapCamera.ignore(this.healthBar);
+  this.miniMapCamera.ignore(this.bullets);
+}
+function create() {
+  this.SprintNum = 0;
+  this.mouse_point = {
+    x: 0,
+    y: 0,
+    velocity_X: 0,
+    velocity_Y: 0,
+  };
+  main.health = 3;
+  main.score = 0;
+  initializeInput.call(this);
+  initializeBackground.call(this);
+  initializePlatforms.call(this);
+  initializePlayer.call(this);
+
+  this.stars = this.physics.add.group();
+  createStar.call(this);
+  this.bullets = this.physics.add.group();
+  this.physics.add.overlap(
+    this.bullets,
+    this.platforms,
+    (bullet, platform) => {
+      bullet.destroy();
+    },
+    null,
+    this
+  );
+  this.stars.children.iterate(function (child) {
+    child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
   });
-}
-function fireBullet(pointer) {
-  // 創建子彈精靈，位置在玩家位置
+  this.bombs = this.physics.add.group();
 
-  this.bullet = this.bullets.create(this.gun.x, this.gun.y, "bullet");
-  this.bullet.body.setSize(5, 5);
-  // 設置子彈的速度和方向
-  let deltaX = this.mouseX - 400;
-  let deltaY = this.mouseY - 300;
-  let length = Math.sqrt(deltaX ** 2 + deltaY ** 2);
-  let velocity = new Phaser.Math.Vector2(
-    1500 * (deltaX / length),
-    1500 * (deltaY / length)
-  )
-    .normalize()
-    .scale(1000);
-
-  if (velocity.x !== 0 || velocity.y !== 0) {
-    let angleInRadians = Math.atan2(velocity.y, velocity.x);
-    this.bullet.setRotation(angleInRadians);
-  }
-  this.gun.x -= velocity.x / 50;
-  this.gun.y -= velocity.y / 50;
-  this.bullet.setVelocity(velocity.x, velocity.y);
-  this.bullet.setImmovable(true);
+  initializeUIset.call(this);
+  initializeEvent.call(this);
+  initializeMap.call(this);
 }
-let max_velocity = {
-  x: 260,
-  y: 500,
-};
+
 function update() {
   this.head.x = this.player.body.x + this.player.body.width / 2;
   this.head.y = this.player.body.y + 16;
   this.gun.setVelocity(
-    (this.player.body.x + this.player.body.width / 2 - this.gun.x) * 10 ,
-    (this.player.body.y + 15 - this.gun.y) * 10 
+    (this.player.body.x + this.player.body.width / 2 - this.gun.x) * 10,
+    (this.player.body.y + 15 - this.gun.y) * 10
   );
 
   let angle_Gun = Phaser.Math.Angle.Between(
@@ -382,6 +331,61 @@ function update() {
   playerAnmation.call(this);
   camerasMove.call(this);
 }
+
+function updatePlayerHealthBar() {
+  // 更新血量條的寬度
+  this.healthBar.setSize(50 * (this.player.health / 3), 25);
+  gmaeEnd.call(this);
+}
+function createStar() {
+  this.platforms.getChildren().forEach((platform) => {
+    for (
+      let i = 0;
+      i <
+      Phaser.Math.Between(
+        0,
+        (1 * (platform.body.right - platform.body.left)) / 100
+      );
+      i++
+    ) {
+      this.stars.create(
+        Phaser.Math.Between(platform.body.left, platform.body.right),
+        platform.body.top - 50,
+        "star"
+      );
+    }
+  });
+}
+function fireBullet(pointer) {
+  // 創建子彈精靈，位置在玩家位置
+
+  this.bullet = this.bullets.create(this.gun.x, this.gun.y, "bullet");
+  this.bullet.body.setSize(5, 5);
+  // 設置子彈的速度和方向
+  let deltaX = this.mouseX - 400;
+  let deltaY = this.mouseY - 300;
+  let length = Math.sqrt(deltaX ** 2 + deltaY ** 2);
+  let velocity = new Phaser.Math.Vector2(
+    1500 * (deltaX / length),
+    1500 * (deltaY / length)
+  )
+    .normalize()
+    .scale(1000);
+
+  if (velocity.x !== 0 || velocity.y !== 0) {
+    let angleInRadians = Math.atan2(velocity.y, velocity.x);
+    this.bullet.setRotation(angleInRadians);
+  }
+  this.gun.x -= velocity.x / 50;
+  this.gun.y -= velocity.y / 50;
+  this.bullet.setVelocity(velocity.x, velocity.y);
+  this.bullet.setImmovable(true);
+}
+let max_velocity = {
+  x: 260,
+  y: 500,
+};
+
 function camerasMove() {
   // this.cameras.main.startFollow(this.player, false, 0.1,  0.1 );
   this.cameras.main.scrollY = this.player.body.y - 300;
@@ -394,10 +398,12 @@ function camerasMove() {
   this.cameras.main.scrollX = Math.floor(
     this.player.body.x - 400.0 + (this.mouse_point.x - 400.0) / 2
   );
-
   this.cameras.main.scrollY = Math.floor(
     this.player.body.y - 300.0 + (this.mouse_point.y - 300.0) / 2
   );
+
+  this.miniMapCamera.scrollX = this.player.x - this.miniMapCamera.width / 2;
+  this.miniMapCamera.scrollY = this.player.y - this.miniMapCamera.height / 2;
   // this.cameras.main.scrollX=this.mouse_point.x;
   // this.cameras.main.scrollY=this.mouse_point.y;
 }
